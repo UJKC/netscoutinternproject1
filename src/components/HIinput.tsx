@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Select from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import "./HIinput.css";
-import { CacheData } from "../utility/interfaces";
+import { CacheData } from "../../archive/interfaces";
 import History from "./HIhistory";
 
 const SelectDemo = ({ selectedRow }: { selectedRow: any }) => {

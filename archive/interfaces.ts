@@ -1,4 +1,4 @@
-import { HI } from "./HI";
+import { HI } from "../src/utility/HI";
 import { last } from "./lastused";
   
 export interface CacheData {

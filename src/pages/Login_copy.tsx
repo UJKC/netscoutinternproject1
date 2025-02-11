@@ -1,22 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
-import { CacheData } from '../utility/interfaces'; // Import interfaces
-
-// Define the new interface structure
-interface StringItem {
-  localVersion: string; // Local version for this string
-  hash: string; // Hash for data integrity
-}
-
-interface SiteCache {
-  [stringKey: string]: StringItem; // Each string is keyed by its name
-}
-
-interface CacheSystem {
-  globalVersion: string; // Common global version for all strings
-  sites: { [siteName: string]: SiteCache }; // Each site has a set of cached strings
-}
+import { CacheSystem } from '../utility/CachedVersionedData';
 
 interface LoginProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;

@@ -2,7 +2,7 @@ import * as React from "react";
 import * as RadixAccordion from "@radix-ui/react-accordion"; // Renamed import
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import classNames from "classnames";
-import { HistoryItem } from "../utility/interfaces";
+import { HistoryItem } from "../../archive/interfaces";
 import "./HIhistory.css"  // Import the HistoryItem type
 
 const getHistoryFromLocalStorage = () => {

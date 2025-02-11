@@ -9,6 +9,6 @@ export interface SiteCache {
   
 export interface CacheSystem {
     globalVersion: string; // Common global version for all strings
-    sites: { [siteName: string]: SiteCache }; // Each site has a set of cached strings
+    sites: { [key: string]: { [key: string]: StringItem } } // Each site has a set of cached strings
 }
   

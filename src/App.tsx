@@ -1,8 +1,8 @@
 import { JSX, useState } from 'react'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
-import Login from './pages/Login'
-import { CacheData } from './utility/interfaces'
+import Login from './pages/Login_copy'
+import { CacheSystem } from './utility/CachedVersionedData'
 
 // PrivateRoute component to check authentication
 const PrivateRoute = ({ element }: { element: JSX.Element }) => {
@@ -12,7 +12,7 @@ const PrivateRoute = ({ element }: { element: JSX.Element }) => {
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true')
-  const [cacheData, setCacheData] = useState<CacheData | null>(null);
+  const [cacheData, setCacheData] = useState<CacheSystem | null>(null);
 
   return (
     <Router>

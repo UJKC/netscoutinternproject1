@@ -345,7 +345,7 @@ const Dashboard = () => {
         <Tabs.Content className="TabsContent" value="tab90">
           <div>
             <h2>Host Intelligence</h2>
-            <App />
+            <App selectedRow={undefined} />
           </div>
         </Tabs.Content>
       )}

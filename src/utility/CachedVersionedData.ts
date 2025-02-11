@@ -1,6 +1,7 @@
 export interface StringItem {
     localVersion: string; // Local version for this string
     hash: string; // Hash for data integrity
+    lastUsed: Date;
 }
   
 export interface SiteCache {

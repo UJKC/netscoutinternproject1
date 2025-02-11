@@ -1,16 +1,4 @@
-export interface StringItem {
-  localVersion: string; // Local version for this string
-  hash: string; // Hash for data integrity
-}
-
-export interface SiteCache {
-  [stringKey: string]: StringItem; // Each string is keyed by its name
-}
-
-export interface CacheSystem {
-  globalVersion: string; // Common global version for all strings
-  sites: { [key: string]: SiteCache }; // Each site has a set of cached strings
-}
+import { CacheSystem } from "./CachedVersionedData";
 
 // Load cache from localStorage on startup
 export const cacheSystem: CacheSystem = loadCacheFromLocalStorage() || {
@@ -47,10 +35,11 @@ function saveCacheToLocalStorage() {
 export function addString(siteName: string, stringKey: string, localVersion: string, hash: string): void {
   if (!cacheSystem.sites[siteName]) {
     cacheSystem.sites[siteName] = {};
+
   }
 
   // Add to cache under the site
-  cacheSystem.sites[siteName][stringKey] = { localVersion, hash };
+  cacheSystem.sites[siteName][stringKey] = { localVersion, hash, lastUsed: new Date()};
   
   // Save to localStorage after cache update
   saveCacheToLocalStorage();
@@ -64,3 +53,5 @@ export function updateGlobalVersion(newVersion: string): void {
   // Save to localStorage after global version update
   saveCacheToLocalStorage();
 }
+
+

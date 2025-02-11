@@ -35,7 +35,8 @@ const Login = ({ setIsLoggedIn, setCacheData }: LoginProps) => {
         cache.sites[hostname] = {
           'exampleKey': {
             localVersion: '1.0.0',
-            hash: 'examplehashvalue'
+            hash: 'examplehashvalue',
+            lastUsed: new Date()
           }
         };
         // Optionally store the empty cache in localStorage for future visits

@@ -2,8 +2,8 @@ import * as React from "react";
 import * as Select from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import "./HIinput.css";
-import { CacheData } from "../../archive/interfaces";
-import History from "./HIhistory";
+import { CacheData } from "./interfaces";
+import History from "../src/components/HIhistory";
 
 const SelectDemo = ({ selectedRow }: { selectedRow: any }) => {
   const [selection, setSelection] = React.useState<string | undefined>(undefined);

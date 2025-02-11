@@ -1,50 +1,66 @@
-interface StringItem {
-    localVersion: string;
-    hash: string;
-  }
-  
-  // Modify CacheSystem to support dynamic keys
-  interface CacheSystem {
-    globalVersion: string;
-    sites: { [key: string]: { [key: string]: StringItem } };
-  }
-  
-  const cacheSystem: CacheSystem = {
-    globalVersion: "1.0",
-    sites: {}
-  };
-  
-  // Adding a string with its hash and local version
-  function addString(siteName: string, stringKey: string, localVersion: string, hash: string): void {
-    if (!cacheSystem.sites[siteName]) {
-      cacheSystem.sites[siteName] = {};
-    }
-    cacheSystem.sites[siteName][stringKey] = { localVersion, hash };
-  }
-  
-  // Retrieving string info (local version and hash)
-  function getStringInfo(siteName: string, stringKey: string): StringItem | null {
-    if (cacheSystem.sites[siteName] && cacheSystem.sites[siteName][stringKey]) {
-      return cacheSystem.sites[siteName][stringKey];
-    }
-    return null;
-  }
-  
-  // Checking if a string exists in a site cache
-  function hasString(siteName: string, stringKey: string): boolean {
-    return !!(cacheSystem.sites[siteName] && cacheSystem.sites[siteName][stringKey]);
-  }
-  
-  // Updating the hash (and local version) for a string
-  function updateString(siteName: string, stringKey: string, localVersion: string, hash: string): void {
-    if (cacheSystem.sites[siteName] && cacheSystem.sites[siteName][stringKey]) {
-      cacheSystem.sites[siteName][stringKey].hash = hash;
-      cacheSystem.sites[siteName][stringKey].localVersion = localVersion;
+export interface StringItem {
+  localVersion: string; // Local version for this string
+  hash: string; // Hash for data integrity
+}
+
+export interface SiteCache {
+  [stringKey: string]: StringItem; // Each string is keyed by its name
+}
+
+export interface CacheSystem {
+  globalVersion: string; // Common global version for all strings
+  sites: { [key: string]: SiteCache }; // Each site has a set of cached strings
+}
+
+// Load cache from localStorage on startup
+export const cacheSystem: CacheSystem = loadCacheFromLocalStorage() || {
+  globalVersion: '1.0.0',
+  sites: {},
+};
+
+// Load cache from localStorage
+function loadCacheFromLocalStorage(): CacheSystem | null {
+  const hostname = window.location.hostname;
+  const cacheData = localStorage.getItem(hostname);
+  if (cacheData) {
+    try {
+      return JSON.parse(cacheData);
+    } catch (error) {
+      console.error('Failed to parse cache data from localStorage', error);
+      return null;
     }
   }
-  
-  // Updating the global version
-  function updateGlobalVersion(newVersion: string): void {
-    cacheSystem.globalVersion = newVersion;
+  return null;
+}
+
+// Save the cache to localStorage
+function saveCacheToLocalStorage() {
+  const hostname = window.location.hostname;
+  try {
+    const cacheData = JSON.stringify(cacheSystem);
+    localStorage.setItem(hostname, cacheData);
+  } catch (error) {
+    console.error('Failed to save cache to localStorage', error);
   }
+}
+
+export function addString(siteName: string, stringKey: string, localVersion: string, hash: string): void {
+  if (!cacheSystem.sites[siteName]) {
+    cacheSystem.sites[siteName] = {};
+  }
+
+  // Add to cache under the site
+  cacheSystem.sites[siteName][stringKey] = { localVersion, hash };
   
+  // Save to localStorage after cache update
+  saveCacheToLocalStorage();
+
+  console.log('Cache updated:', cacheSystem);
+}
+
+export function updateGlobalVersion(newVersion: string): void {
+  cacheSystem.globalVersion = newVersion;
+
+  // Save to localStorage after global version update
+  saveCacheToLocalStorage();
+}

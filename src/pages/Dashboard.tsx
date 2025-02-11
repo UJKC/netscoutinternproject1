@@ -2,7 +2,8 @@ import { Tabs } from "radix-ui";
 import { Avatar } from "radix-ui";
 import './dashboard.css';
 import { useState } from "react";
-import App from "../components/HIinput";
+import App from "../../archive/HIinput";
+import HostInput from "../components/HostInput";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<string | undefined>("tab1");
@@ -345,7 +346,7 @@ const Dashboard = () => {
         <Tabs.Content className="TabsContent" value="tab90">
           <div>
             <h2>Host Intelligence</h2>
-            <App selectedRow={undefined} />
+            <HostInput/>
           </div>
         </Tabs.Content>
       )}

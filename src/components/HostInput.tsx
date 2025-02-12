@@ -361,34 +361,36 @@ function formatCacheData(siteCache: any): StringItem[] {
       </div>
 
 
-      {/* Cache Data Table */}
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+{/* Cache Data Table */}
+<table style={{ width: '100%', borderCollapse: 'collapse' }}>
   <thead>
     <tr>
+      <th>SLno</th> {/* Added SLno column */}
       <th>Key</th>
       <th>Action</th>
       <th>Last Used</th>
     </tr>
   </thead>
   <tbody>
-  {filteredData.length === 0 ? (
-    <tr>
-      <td colSpan={3}>No data found</td>
-    </tr>
-  ) : (
-    filteredData.map((item, index) => (
-      <tr key={item.key}>
-        <td>{item.key}</td>
-        <td>
-          <button onClick={() => handleAddSearchClick(item.key)}>Add Search</button>
-        </td>
-        <td>{formatDistanceToNow(item.lastUsed)} ago</td>
+    {filteredData.length === 0 ? (
+      <tr>
+        <td colSpan={4}>No data found</td> {/* Adjusted to span 4 columns now */}
       </tr>
-    ))
-  )}
-</tbody>
-
+    ) : (
+      filteredData.map((item, index) => (
+        <tr key={item.key}>
+          <td>{index + 1}</td> {/* Added serial number here */}
+          <td>{item.key}</td>
+          <td>
+            <button onClick={() => handleAddSearchClick(item.key)}>Add Search</button>
+          </td>
+          <td>{formatDistanceToNow(item.lastUsed)} ago</td>
+        </tr>
+      ))
+    )}
+  </tbody>
 </table>
+
 
 
       {/* Load More Button */}

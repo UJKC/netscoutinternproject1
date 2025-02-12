@@ -236,7 +236,7 @@ function formatCacheData(siteCache: any): StringItem[] {
     }
 
     // Hash the data before saving it
-    const hashedData = await generateSHA256Hash(dataToCache + `5000`); // Implement your hashing function here
+    const hashedData = await generateSHA256Hash(dataToCache); // Implement your hashing function here
 
     // Add to cache using MoreUtility functions
     try {
@@ -362,34 +362,41 @@ function formatCacheData(siteCache: any): StringItem[] {
 
 
 {/* Cache Data Table */}
-<table style={{ width: '100%', borderCollapse: 'collapse' }}>
+<table style={{ 
+  width: '100%', 
+  borderCollapse: 'collapse', 
+  backgroundColor: 'white', 
+  color: 'black', 
+  textAlign: 'center' 
+}}>
   <thead>
     <tr>
-      <th>SLno</th> {/* Added SLno column */}
-      <th>Key</th>
-      <th>Action</th>
-      <th>Last Used</th>
+      <th style={{ border: '1px solid black'}}>SLno</th> {/* Added border to th */}
+      <th style={{ border: '1px solid black'}}>Key</th>
+      <th style={{ border: '1px solid black'}}>Action</th>
+      <th style={{ border: '1px solid black'}}>Last Used</th>
     </tr>
   </thead>
   <tbody>
     {filteredData.length === 0 ? (
       <tr>
-        <td colSpan={4}>No data found</td> {/* Adjusted to span 4 columns now */}
+        <td colSpan={4} style={{ border: '1px solid black'}}>No data found</td> {/* Adjusted with border */}
       </tr>
     ) : (
       filteredData.map((item, index) => (
         <tr key={item.key}>
-          <td>{index + 1}</td> {/* Added serial number here */}
-          <td>{item.key}</td>
-          <td>
+          <td style={{ border: '1px solid black'}}>{index + 1}</td> {/* Added border */}
+          <td style={{ border: '1px solid black'}}>{item.key}</td>
+          <td style={{ border: '1px solid black'}}>
             <button onClick={() => handleAddSearchClick(item.key)}>Add Search</button>
           </td>
-          <td>{formatDistanceToNow(item.lastUsed)} ago</td>
+          <td style={{ border: '1px solid black'}}>{formatDistanceToNow(item.lastUsed)} ago</td>
         </tr>
       ))
     )}
   </tbody>
 </table>
+
 
 
 

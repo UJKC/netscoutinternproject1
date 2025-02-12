@@ -16,6 +16,6 @@ export const generateSHA256Hash = async (input: string): Promise<string> => {
 
 
 export const validateSHA256Hash = async (input: string, expectedHash: string): Promise<boolean> => {
-    const generatedHash = generateSHA256Hash(input + `5000`); // Generate the hash for the input
+    const generatedHash = generateSHA256Hash(input); // Generate the hash for the input
     return await generatedHash === expectedHash; // Compare the generated hash with the expected one
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns'; // For human-readable date difference
-import { addString } from '../utility/MoreUtility';
-import { generateSHA256Hash } from '../utility/Crypto';
+import { addString, removeString } from '../utility/MoreUtility';
+import { generateSHA256Hash, validateSHA256Hash } from '../utility/Crypto';
 import { loadCacheFromLocalStorage } from '../utility/MoreUtility'
 import { StringItem } from '../utility/CachedVersionedData';
 import ApplicationSelect from './ApplicationSelect';
@@ -32,10 +32,17 @@ const CacheGrid: React.FC = () => {
   const [applicationValue, setApplicationValue] = useState<string>('');
   const [geolocationValue, setGeolocationValue] = useState<string>('');
   const [conversationValue, setConversationValue] = useState<string>('');
+  const [conversationValue1, setConversationValue1] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [reloadrequired, setreload] = useState<Number>(0)
 
+
+
+  // Assuming validateSHA256Hash is already imported
+  
   useEffect(() => {
+    let reloadRequired = false;
     // Load the cache from localStorage on initial load
     const loadedCacheData = loadCacheFromLocalStorage();
     if (loadedCacheData) {
@@ -43,38 +50,59 @@ const CacheGrid: React.FC = () => {
       const formattedData = formatCacheData(siteCache);
   
       if (formattedData.length > 0) {
-        // Get the most recent cache entry
-        
-        const mostRecentItem = formattedData[0]; // Since data is sorted by lastUsed, the first item is the most recent.
-        console.log(mostRecentItem)
-        // Automatically populate the form fields
-        const parts = mostRecentItem.key.split(' | ');
-        console.log(parts)
-        setSelection('Host');
-        parts.forEach((part: string) => {
-          if (part.startsWith('Host:')) {
-            setHostValue(part.replace('Host: ', '').trim());
-          }
-          if (part.startsWith('port:')) {
-            setSelection('Host and Port');
-            setPortValue(part.replace('port: ', '').trim());
-          }
-          if (part.startsWith('application:')) {
-            setSelection('Host and Application');
-            setApplicationValue('');
-          }
-          if (part.startsWith('geolocation:')) {
-            setSelection('Host and Geolocation');
-            setGeolocationValue('');
-          }
-          if (part.startsWith('Conversation:')) {
-            setSelection('Conversation');
-            setConversationValue(part.replace('Conversation: ', '').trim());
+        // Loop through all the items in formattedData to validate them
+        const validationPromises = formattedData.map(async (item) => {
+          const isValid = await validateSHA256Hash(item.key, item.hash);
+          
+          if (!isValid) {
+            console.log(`Invalid hash for item: ${item.key}`);
+            removeString('HI', item.key);
+            window.location.reload();
           }
         });
+
+        
   
-        setCacheData(formattedData);
-        setVisibleData(formattedData.slice(0, 10)); // Initially show first 10 items
+        // Wait for all validation checks to complete
+        Promise.all(validationPromises).then(() => {
+          if (reloadRequired) {
+            window.location.reload();
+          } else {
+          // After validation, get the most recent cache entry
+          const mostRecentItem = formattedData[0]; // Since data is sorted by lastUsed, the first item is the most recent.
+          console.log(mostRecentItem);
+  
+          // Automatically populate the form fields
+          const parts = mostRecentItem.key.split(' | ');
+          console.log(parts);
+  
+          setSelection('Host');
+          parts.forEach((part: string) => {
+            if (part.startsWith('Host:')) {
+              setHostValue(part.replace('Host: ', '').trim());
+            }
+            if (part.startsWith('port:')) {
+              setSelection('Host and Port');
+              setPortValue(part.replace('port: ', '').trim());
+            }
+            if (part.startsWith('application:')) {
+              setSelection('Host and Application');
+              setApplicationValue('');
+            }
+            if (part.startsWith('geolocation:')) {
+              setSelection('Host and Geolocation');
+              setGeolocationValue('');
+            }
+            if (part.startsWith('Conversation:')) {
+              setSelection('Conversation');
+              setConversationValue(part.replace('Conversation: ', '').trim());
+            }
+          });
+  
+          setCacheData(formattedData);
+          setVisibleData(formattedData.slice(0, 10)); // Initially show first 10 items
+        }
+        });
       }
     }
   }, []);
@@ -118,6 +146,7 @@ function formatCacheData(siteCache: any): StringItem[] {
     let application = '';
     let geolocation = '';
     let conversation = '';
+    let conversation1 = '';
   
     // Loop through the parts to match and extract values
     parts.forEach(part => {
@@ -135,6 +164,9 @@ function formatCacheData(siteCache: any): StringItem[] {
       }
       if (part.startsWith('Conversation:')) {
         conversation = part.replace('Conversation: ', '').trim();
+      }
+      if (part.startsWith('Conversation1:')) {
+        conversation1 = part.replace('Conversation1: ', '').trim();
       }
     });
   
@@ -154,6 +186,9 @@ function formatCacheData(siteCache: any): StringItem[] {
     } else if (conversation) {
       setSelection('Conversation');
       setConversationValue(conversation);
+    } else if (conversation1) {
+      setSelection('Conversation');
+      setConversationValue1(conversation1);
     } else {
       setSelection('Host');
       setHostValue(host);
@@ -202,6 +237,9 @@ function formatCacheData(siteCache: any): StringItem[] {
       case 'conversation':
         setConversationValue(event.target.value);
         break;
+      case 'conversation1':
+        setConversationValue1(event.target.value)
+        break;
       default:
         break;
     }
@@ -229,7 +267,7 @@ function formatCacheData(siteCache: any): StringItem[] {
         dataToCache = `Host: ${hostValue} | geolocation: ${geolocationValue}`;
         break;
       case 'Conversation':
-        dataToCache = `Conversation: ${conversationValue}`;
+        dataToCache = `Conversation: ${conversationValue} | Conversation1: ${conversationValue1}`;
         break;
       default:
         break;
@@ -341,6 +379,12 @@ function formatCacheData(siteCache: any): StringItem[] {
                 type="text"
                 value={conversationValue}
                 onChange={(e) => handleInputChange(e, 'conversation')}
+                placeholder="Enter conversation"
+              />
+              <input
+                type="text"
+                value={conversationValue1}
+                onChange={(e) => handleInputChange(e, 'conversation1')}
                 placeholder="Enter conversation"
               />
             </>

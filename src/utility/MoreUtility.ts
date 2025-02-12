@@ -54,4 +54,29 @@ export function updateGlobalVersion(newVersion: string): void {
   saveCacheToLocalStorage();
 }
 
-
+export function removeString(siteName: string, stringKey: string): void {
+  // Check if the site exists in cache
+  if (cacheSystem.sites[siteName]) {
+    // Check if the stringKey exists under the site
+    if (cacheSystem.sites[siteName][stringKey]) {
+      // Delete the stringKey from the cache
+      delete cacheSystem.sites[siteName][stringKey];
+      console.log(`Removed string: ${stringKey} from site: ${siteName}`);
+    } else {
+      console.log(`StringKey: ${stringKey} does not exist under site: ${siteName}`);
+    }
+    
+    // If the site has no more entries, you can also remove the site (optional)
+    if (Object.keys(cacheSystem.sites[siteName]).length === 0) {
+      delete cacheSystem.sites[siteName];
+      console.log(`Removed site: ${siteName} from cache as it has no more strings`);
+    }
+    
+    // Save updated cache to localStorage after removal
+    saveCacheToLocalStorage();
+    
+    console.log('Cache updated after removal:', cacheSystem);
+  } else {
+    console.log(`Site: ${siteName} does not exist in cache`);
+  }
+}

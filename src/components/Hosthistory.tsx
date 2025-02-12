@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { CacheSystem } from '../utility/CachedVersionedData'; // Import CacheSystem
-import { formatDistanceToNow } from 'date-fns'; // For date formatting
+import { formatDistanceToNow } from 'date-fns'; // For human-readable date difference
+import HostInput from './HostInput'; // Assuming HostInput is in the same directory
 
 const CacheGrid: React.FC = () => {
   // State for cache data, search term, and pagination
   const [cacheData, setCacheData] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [visibleData, setVisibleData] = useState<any[]>([]);
   const [page, setPage] = useState<number>(1); // Pagination starts with page 1
+  const [hostInputData, setHostInputData] = useState<any>({}); // State for HostInput
 
   useEffect(() => {
     // Load the cache from localStorage on initial load
@@ -21,7 +21,7 @@ const CacheGrid: React.FC = () => {
   }, []);
 
   // Load cache from localStorage
-  function loadCacheFromLocalStorage(): CacheSystem | null {
+  function loadCacheFromLocalStorage(): any {
     const cacheData = localStorage.getItem('cacheSystem');
     if (cacheData) {
       return JSON.parse(cacheData);
@@ -36,21 +36,31 @@ const CacheGrid: React.FC = () => {
       data: siteCache[key],
       lastUsed: new Date(), // For this example, we assume the last used date is now
     }));
+
+    // Sort by most recent usage (lastUsed)
+    formattedData.sort((a, b) => b.lastUsed.getTime() - a.lastUsed.getTime());
     return formattedData;
   }
 
-  // Handle search functionality
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const term = event.target.value;
-    setSearchTerm(term);
+  // Handle the action when the "Add Search" button is clicked
+  const handleAddSearchClick = (key: string) => {
+    console.log('Add Search clicked for:', key);
 
-    // Filter cache data based on the search term
-    const filteredData = cacheData.filter((item) =>
-      item.key.toLowerCase().includes(term.toLowerCase())
-    );
+    // Example key: "Host: localhost | port: 9000"
+    const parts = key.split(' | ');
+    const hostPart = parts.find((part) => part.startsWith('Host:'));
+    const portPart = parts.find((part) => part.startsWith('port:'));
 
-    // Update visible data based on filtered search and pagination
-    setVisibleData(filteredData.slice(0, 10)); // Show first 10 matching items
+    // Extract host and port
+    const host = hostPart?.replace('Host: ', '').trim();
+    const port = portPart?.replace('port: ', '').trim();
+
+    // Update the HostInput state with the parsed values
+    setHostInputData({
+      selector: 'Host and Port', // Set the selector to Host and Port
+      host: host || '',
+      port: port || '',
+    });
   };
 
   // Handle load more functionality (pagination)
@@ -63,33 +73,16 @@ const CacheGrid: React.FC = () => {
     setVisibleData(newVisibleData);
   };
 
-  // Handle the action when the "Add Search" button is clicked
-  const handleAddSearchClick = (key: string) => {
-    const dataToCache = key;
-    // Here you can update the "HostInput" selector input (use state to control it)
-    // For simplicity, we will just set the search term in the selector
-    setSearchTerm(dataToCache);
-  };
-
   return (
     <div>
-      {/* Search Input */}
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={handleSearch}
-        placeholder="Search Cache"
-        style={{ marginBottom: '20px', padding: '5px' }}
-      />
-
       {/* Cache Data Table */}
-      <table>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
+            <th>SLno</th>
             <th>Key</th>
-            <th>Search</th>
+            <th>Action</th>
             <th>Last Used</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -98,14 +91,14 @@ const CacheGrid: React.FC = () => {
               <td colSpan={4}>No data found</td>
             </tr>
           ) : (
-            visibleData.map((item) => (
+            visibleData.map((item, index) => (
               <tr key={item.key}>
+                <td>{index + 1}</td>
                 <td>{item.key}</td>
-                <td>{item.key}</td>
-                <td>{formatDistanceToNow(item.lastUsed)} ago</td>
                 <td>
                   <button onClick={() => handleAddSearchClick(item.key)}>Add Search</button>
                 </td>
+                <td>{formatDistanceToNow(item.lastUsed)} ago</td>
               </tr>
             ))
           )}
@@ -114,8 +107,13 @@ const CacheGrid: React.FC = () => {
 
       {/* Load More Button */}
       {visibleData.length < cacheData.length && (
-        <button onClick={loadMore}>Load More</button>
+        <button onClick={loadMore} style={{ marginTop: '10px' }}>
+          Load More
+        </button>
       )}
+
+      {/* HostInput component */}
+      <HostInput inputData={hostInputData} />
     </div>
   );
 };

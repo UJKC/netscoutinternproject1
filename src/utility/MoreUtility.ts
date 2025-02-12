@@ -7,7 +7,7 @@ export const cacheSystem: CacheSystem = loadCacheFromLocalStorage() || {
 };
 
 // Load cache from localStorage
-function loadCacheFromLocalStorage(): CacheSystem | null {
+export function loadCacheFromLocalStorage(): CacheSystem | null {
   const hostname = window.location.hostname;
   const cacheData = localStorage.getItem(hostname);
   if (cacheData) {

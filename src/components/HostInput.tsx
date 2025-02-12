@@ -5,6 +5,7 @@ import { generateSHA256Hash } from '../utility/Crypto';
 import { loadCacheFromLocalStorage } from '../utility/MoreUtility'
 import { StringItem } from '../utility/CachedVersionedData';
 import ApplicationSelect from './ApplicationSelect';
+import GeolocationSelect from './GeolocationSelect';
 
 interface HostInputData {
   selector: string;
@@ -60,11 +61,11 @@ const CacheGrid: React.FC = () => {
           }
           if (part.startsWith('application:')) {
             setSelection('Host and Application');
-            setApplicationValue(part.replace('application: ', '').trim());
+            setApplicationValue('');
           }
           if (part.startsWith('geolocation:')) {
             setSelection('Host and Geolocation');
-            setGeolocationValue(part.replace('geolocation: ', '').trim());
+            setGeolocationValue('');
           }
           if (part.startsWith('Conversation:')) {
             setSelection('Conversation');
@@ -323,15 +324,15 @@ function formatCacheData(siteCache: any): StringItem[] {
                 onChange={(e) => handleInputChange(e, 'host')}
                 placeholder="Enter host"
               />
+              
               <label>Geolocation:</label>
-              <input
-                type="text"
-                value={geolocationValue}
-                onChange={(e) => handleInputChange(e, 'geolocation')}
-                placeholder="Enter geolocation"
+              <GeolocationSelect
+                selectedValue={geolocationValue}
+                onChange={(value: string) => setGeolocationValue(value)}  // Update geolocation value in parent state
               />
             </>
           )}
+
 
           {selection === 'Conversation' && (
             <>

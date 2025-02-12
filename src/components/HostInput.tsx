@@ -4,6 +4,7 @@ import { addString } from '../utility/MoreUtility';
 import { generateSHA256Hash } from '../utility/Crypto';
 import { loadCacheFromLocalStorage } from '../utility/MoreUtility'
 import { StringItem } from '../utility/CachedVersionedData';
+import ApplicationSelect from './ApplicationSelect';
 
 interface HostInputData {
   selector: string;
@@ -304,13 +305,12 @@ function formatCacheData(siteCache: any): StringItem[] {
                 onChange={(e) => handleInputChange(e, 'host')}
                 placeholder="Enter host"
               />
-              <label>Application:</label>
-              <input
-                type="text"
-                value={applicationValue}
-                onChange={(e) => handleInputChange(e, 'application')}
-                placeholder="Enter application"
-              />
+                  <label>Application:</label>
+                <ApplicationSelect
+                  selectedValue={applicationValue}
+                  onChange={(value: string) => setApplicationValue(value)}  // Update the application value
+                />
+
             </>
           )}
 

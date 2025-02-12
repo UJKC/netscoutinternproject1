@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns'; // For human-readable date difference
-import HostInput from './HostInput'; // Assuming HostInput is in the same directory
+import HostInput from '../src/components/HostInput'; // Assuming HostInput is in the same directory
 
 const CacheGrid: React.FC = () => {
   // State for cache data, search term, and pagination

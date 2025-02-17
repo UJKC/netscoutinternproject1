@@ -21,10 +21,6 @@ const CacheGrid: React.FC = () => {
   const [cacheData, setCacheData] = useState<StringItem[]>([]);
   const [visibleData, setVisibleData] = useState<StringItem[]>([]);
   const [page, setPage] = useState<number>(1); // Pagination starts with page 1
-  const [hostInputData, setHostInputData] = useState<HostInputData>({
-    selector: 'Host',
-    host: '',
-  }); // State for HostInput
 
   const [selection, setSelection] = useState<string>('Host');
   const [hostValue, setHostValue] = useState<string>('');
@@ -59,53 +55,62 @@ const CacheGrid: React.FC = () => {
             removeString('HI', item.key);
             window.location.reload();
           }
-        });
-
-        
   
-        // Wait for all validation checks to complete
+          // Check if the item is older than 1 month
+          const oneMonthAgo = new Date();
+          oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  
+          if (item.lastUsed < oneMonthAgo) {
+            console.log(`Removing outdated item: ${item.key}`);
+            removeString('HI', item.key);
+            reloadRequired = true;  // Mark that a reload is required after removal
+          }
+        });
+  
+        // Wait for all validation checks and removal to complete
         Promise.all(validationPromises).then(() => {
           if (reloadRequired) {
             window.location.reload();
           } else {
-          // After validation, get the most recent cache entry
-          const mostRecentItem = formattedData[0]; // Since data is sorted by lastUsed, the first item is the most recent.
-          console.log(mostRecentItem);
+            // After validation, get the most recent cache entry
+            const mostRecentItem = formattedData[0]; // Since data is sorted by lastUsed, the first item is the most recent.
+            console.log(mostRecentItem);
   
-          // Automatically populate the form fields
-          const parts = mostRecentItem.key.split(' | ');
-          console.log(parts);
+            // Automatically populate the form fields
+            const parts = mostRecentItem.key.split(' | ');
+            console.log(parts);
   
-          setSelection('Host');
-          parts.forEach((part: string) => {
-            if (part.startsWith('Host:')) {
-              setHostValue(part.replace('Host: ', '').trim());
-            }
-            if (part.startsWith('port:')) {
-              setSelection('Host and Port');
-              setPortValue(part.replace('port: ', '').trim());
-            }
-            if (part.startsWith('application:')) {
-              setSelection('Host and Application');
-              setApplicationValue('');
-            }
-            if (part.startsWith('geolocation:')) {
-              setSelection('Host and Geolocation');
-              setGeolocationValue('');
-            }
-            if (part.startsWith('Conversation:')) {
-              setSelection('Conversation');
-              setConversationValue(part.replace('Conversation: ', '').trim());
-            }
-          });
+            setSelection('Host');
+            parts.forEach((part: string) => {
+              if (part.startsWith('Host:')) {
+                setHostValue(part.replace('Host: ', '').trim());
+              }
+              if (part.startsWith('port:')) {
+                setSelection('Host and Port');
+                setPortValue(part.replace('port: ', '').trim());
+              }
+              if (part.startsWith('application:')) {
+                setSelection('Host and Application');
+                setApplicationValue('');
+              }
+              if (part.startsWith('geolocation:')) {
+                setSelection('Host and Geolocation');
+                setGeolocationValue('');
+              }
+              if (part.startsWith('Conversation:')) {
+                setSelection('Conversation');
+                setConversationValue(part.replace('Conversation: ', '').trim());
+              }
+            });
   
-          setCacheData(formattedData);
-          setVisibleData(formattedData.slice(0, 10)); // Initially show first 10 items
-        }
+            setCacheData(formattedData);
+            setVisibleData(formattedData.slice(0, 10)); // Initially show first 10 items
+          }
         });
       }
     }
   }, []);
+  
   
   
 
@@ -280,8 +285,10 @@ function formatCacheData(siteCache: any): StringItem[] {
     try {
       addString('HI', dataToCache, '1.0.0', hashedData); // Add to cache with site "HI"
       setMessage('Successfully added to cache!');
+      window.location.reload()
     } catch (error) {
       setMessage('Failed to add to cache.');
+      window.location.reload()
     }
 
     alert(message); // Show success or failure message

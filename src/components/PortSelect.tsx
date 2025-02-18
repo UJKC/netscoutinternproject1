@@ -2,34 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { formatCacheData, loadCacheFromLocalStorage, removeString } from '../utility/MoreUtility';
 import { validateSHA256Hash } from '../utility/Crypto';
 
-interface HostSelectProps {
-    hostValue: string;
-    onHostChange: (value: string) => void;
+interface PortSelectProps {
+    portValue: string;
+    onPortChange: (value: string) => void;
 }
 
-const HostSelect: React.FC<HostSelectProps> = ({ hostValue, onHostChange }) => {
+const PortSelect: React.FC<PortSelectProps> = ({ portValue, onPortChange }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [filteredHosts, setFilteredHosts] = useState<string[]>([]);
-    const [hostOptions, setHostOptions] = useState<string[]>([]); // Store host options from cache
+    const [filteredPorts, setFilteredPorts] = useState<string[]>([]);
+    const [portOptions, setPortOptions] = useState<string[]>([]); // Store port options from cache
 
-    // Handle input change for Host field
+    // Handle input change for Port field
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        onHostChange(value); // Propagate to parent
+        onPortChange(value); // Propagate to parent
 
-        // Filter host options based on input value
-        const filtered = hostOptions.filter((host) =>
-            host.toLowerCase().includes(value.toLowerCase())
+        // Filter port options based on input value
+        const filtered = portOptions.filter((port) =>
+            port.toLowerCase().includes(value.toLowerCase())
         );
-        setFilteredHosts(filtered);
+        setFilteredPorts(filtered);
 
         // Open the dropdown if there are matching options
         setIsDropdownOpen(filtered.length > 0);
     };
 
     // Handle selecting an option from the dropdown
-    const handleHostSelect = (host: string) => {
-        onHostChange(host);
+    const handlePortSelect = (port: string) => {
+        onPortChange(port);
         setIsDropdownOpen(false); // Close the dropdown after selection
     };
 
@@ -52,28 +52,28 @@ const HostSelect: React.FC<HostSelectProps> = ({ hostValue, onHostChange }) => {
                     }
                 });
 
-                // After all validations, set valid hosts if all hashes are valid
+                // After all validations, set valid ports if all hashes are valid
                 Promise.all(validationPromises).then(() => {
                     if (reloadRequired) {
                         window.location.reload(); // Force reload if invalid cache was found
                     } else {
-                        // Set the host options as item.key values
+                        // Set the port options as item.key values
                         const validKeys = formattedData.map((item) => item.key);
                         const updatedValidKeys: string[] = [];
                         validKeys.forEach((key) => {
                             const parts = key.split(" | "); // Split by " | "
                             parts.forEach((part: string) => {
-                                if (part.startsWith("Host: ")) {
-                                    const host = part.replace("Host: ", ""); // Remove "Host: " prefix
-                                    updatedValidKeys.push(host); // Add to updatedValidKeys
+                                if (part.startsWith("port: ")) {
+                                    const port = part.replace("port: ", ""); // Remove "Port: " prefix
+                                    updatedValidKeys.push(port); // Add to updatedValidKeys
                                 }
                             });
                         });
 
                         // Remove duplicates using Set and convert back to an array
-                        const uniqueHostOptions = [...new Set(updatedValidKeys)];
+                        const uniquePortOptions = [...new Set(updatedValidKeys)];
 
-                        setHostOptions(uniqueHostOptions);
+                        setPortOptions(uniquePortOptions);
                     }
                 });
             }
@@ -82,15 +82,15 @@ const HostSelect: React.FC<HostSelectProps> = ({ hostValue, onHostChange }) => {
 
     return (
         <div style={{ position: 'relative' }}>
-            <label>Host:</label>
+            <label>Port:</label>
             <input
                 type="text"
-                value={hostValue}
+                value={portValue}
                 onChange={handleInputChange}
-                placeholder="Enter host"
+                placeholder="Enter port"
             />
 
-            {/* Show filtered dropdown if there are matching host options */}
+            {/* Show filtered dropdown if there are matching port options */}
             {isDropdownOpen && (
                 <ul
                     style={{
@@ -109,16 +109,16 @@ const HostSelect: React.FC<HostSelectProps> = ({ hostValue, onHostChange }) => {
                         color: 'black',
                     }}
                 >
-                    {filteredHosts.map((host) => (
+                    {filteredPorts.map((port) => (
                         <li
-                            key={host}
-                            onClick={() => handleHostSelect(host)}
+                            key={port}
+                            onClick={() => handlePortSelect(port)}
                             style={{
                                 padding: '5px 10px',
                                 cursor: 'pointer',
                             }}
                         >
-                            {host}
+                            {port}
                         </li>
                     ))}
                 </ul>
@@ -127,4 +127,4 @@ const HostSelect: React.FC<HostSelectProps> = ({ hostValue, onHostChange }) => {
     );
 };
 
-export default HostSelect;
+export default PortSelect;

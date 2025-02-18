@@ -1,4 +1,4 @@
-import { CacheSystem } from "./CachedVersionedData";
+import { CacheSystem, StringItem } from "./CachedVersionedData";
 
 // Load cache from localStorage on startup
 export const cacheSystem: CacheSystem = loadCacheFromLocalStorage() || {
@@ -80,3 +80,23 @@ export function removeString(siteName: string, stringKey: string): void {
     console.log(`Site: ${siteName} does not exist in cache`);
   }
 }
+
+export function formatCacheData(siteCache: any): StringItem[] {
+    console.log("Hereeeee");
+
+    if (!siteCache) {
+      console.error('siteCache is null or undefined');
+      return [];  // Return an empty array or handle the error accordingly
+    }
+
+    const formattedData = Object.keys(siteCache).map((key) => ({
+      key,
+      localVersion: siteCache[key].localVersion || '',  // Default to empty string if undefined
+      hash: siteCache[key].hash || '',                  // Default to empty string if undefined
+      lastUsed: siteCache[key].lastUsed ? new Date(siteCache[key].lastUsed) : new Date(),                             // Current date
+    }));
+
+    const sortedData = formattedData.sort((a, b) => b.lastUsed.getTime() - a.lastUsed.getTime());
+
+    return sortedData;
+  }

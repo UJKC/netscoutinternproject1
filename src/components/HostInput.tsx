@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns'; // For human-readable date difference
-import { addString, removeString } from '../utility/MoreUtility';
+import { addString, formatCacheData, removeString } from '../utility/MoreUtility';
 import { generateSHA256Hash, validateSHA256Hash } from '../utility/Crypto';
 import { loadCacheFromLocalStorage } from '../utility/MoreUtility'
 import { StringItem } from '../utility/CachedVersionedData';
 import ApplicationSelect from './ApplicationSelect';
 import GeolocationSelect from './GeolocationSelect';
 import HostSelect from './HostSelect';
+import PortSelect from './PortSelect';
 
 
 const CacheGrid: React.FC = () => {
@@ -100,31 +101,7 @@ const CacheGrid: React.FC = () => {
         });
       }
     }
-  }, []);
-
-
-
-
-  // Format cache data with last used date and other details
-  function formatCacheData(siteCache: any): StringItem[] {
-    console.log("Hereeeee");
-
-    if (!siteCache) {
-      console.error('siteCache is null or undefined');
-      return [];  // Return an empty array or handle the error accordingly
-    }
-
-    const formattedData = Object.keys(siteCache).map((key) => ({
-      key,
-      localVersion: siteCache[key].localVersion || '',  // Default to empty string if undefined
-      hash: siteCache[key].hash || '',                  // Default to empty string if undefined
-      lastUsed: siteCache[key].lastUsed ? new Date(siteCache[key].lastUsed) : new Date(),                             // Current date
-    }));
-
-    const sortedData = formattedData.sort((a, b) => b.lastUsed.getTime() - a.lastUsed.getTime());
-
-    return sortedData;
-  }
+  }, [])
 
 
 
@@ -317,24 +294,19 @@ const CacheGrid: React.FC = () => {
                 hostValue={hostValue}
                 onHostChange={(value) => setHostValue(value)}  // Update host state in parent
               />
-              <label>Port:</label>
-              <input
-                type="text"
-                value={portValue}
-                onChange={(e) => handleInputChange(e, 'port')}
-                placeholder="Enter port"
+              <PortSelect
+                portValue={portValue}
+                onPortChange={(value: React.SetStateAction<string>) => setPortValue(value)} // Pass the function to update the port value in the parent
               />
+
             </>
           )}
 
           {selection === 'Host and Application' && (
             <>
-              <label>Host:</label>
-              <input
-                type="text"
-                value={hostValue}
-                onChange={(e) => handleInputChange(e, 'host')}
-                placeholder="Enter host"
+              <HostSelect
+                hostValue={hostValue}
+                onHostChange={(value) => setHostValue(value)}  // Update host state in parent
               />
               <label>Application:</label>
               <ApplicationSelect

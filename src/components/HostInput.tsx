@@ -6,6 +6,7 @@ import { loadCacheFromLocalStorage } from '../utility/MoreUtility'
 import { StringItem } from '../utility/CachedVersionedData';
 import ApplicationSelect from './ApplicationSelect';
 import GeolocationSelect from './GeolocationSelect';
+import HostSelect from './HostSelect';
 
 
 const CacheGrid: React.FC = () => {
@@ -13,7 +14,6 @@ const CacheGrid: React.FC = () => {
   const [cacheData, setCacheData] = useState<StringItem[]>([]);
   const [visibleData, setVisibleData] = useState<StringItem[]>([]);
   const [page, setPage] = useState<number>(1); // Pagination starts with page 1
-
   const [selection, setSelection] = useState<string>('Host');
   const [hostValue, setHostValue] = useState<string>('');
   const [portValue, setPortValue] = useState<string>('');
@@ -23,7 +23,6 @@ const CacheGrid: React.FC = () => {
   const [conversationValue1, setConversationValue1] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [reloadrequired, setreload] = useState<Number>(0)
 
 
 
@@ -305,24 +304,18 @@ const CacheGrid: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           {selection === 'Host' && (
             <>
-              <label>Host:</label>
-              <input
-                type="text"
-                value={hostValue}
-                onChange={(e) => handleInputChange(e, 'host')}
-                placeholder="Enter host"
+              <HostSelect
+                hostValue={hostValue}
+                onHostChange={(value) => setHostValue(value)}  // Update host state in parent
               />
             </>
           )}
 
           {selection === 'Host and Port' && (
             <>
-              <label>Host:</label>
-              <input
-                type="text"
-                value={hostValue}
-                onChange={(e) => handleInputChange(e, 'host')}
-                placeholder="Enter host"
+              <HostSelect
+                hostValue={hostValue}
+                onHostChange={(value) => setHostValue(value)}  // Update host state in parent
               />
               <label>Port:</label>
               <input
@@ -354,12 +347,9 @@ const CacheGrid: React.FC = () => {
 
           {selection === 'Host and Geolocation' && (
             <>
-              <label>Host:</label>
-              <input
-                type="text"
-                value={hostValue}
-                onChange={(e) => handleInputChange(e, 'host')}
-                placeholder="Enter host"
+              <HostSelect
+                hostValue={hostValue}
+                onHostChange={(value) => setHostValue(value)}  // Update host state in parent
               />
 
               <label>Geolocation:</label>
